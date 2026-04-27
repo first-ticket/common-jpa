@@ -2,8 +2,12 @@ package com.firstticket.common.persistence;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -19,6 +23,11 @@ import java.util.UUID;
 
 @Slf4j
 @Component
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+@ConditionalOnClass(name = {
+    "org.springframework.web.context.request.RequestContextHolder",
+    "jakarta.servlet.http.HttpServletRequest"
+})
 public class SecurityAuditorAware implements AuditorAware<UUID> {
 
     // API Gateway가 JWT 검증 후 각 서비스 요청 헤더에 삽입하는 사용자 ID
@@ -35,12 +44,14 @@ public class SecurityAuditorAware implements AuditorAware<UUID> {
     @Override
     public Optional<UUID> getCurrentAuditor() {
         try {
-            ServletRequestAttributes attributes = (ServletRequestAttributes)
-                RequestContextHolder.currentRequestAttributes();
+            RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 
-            HttpServletRequest request = attributes.getRequest();
+            // 서블릿 환경이 아닌 경우(WebFlux, 비동기, Flyway 등) instanceof 체크로 안전하게 처리
+            if (!(requestAttributes instanceof ServletRequestAttributes attributes)) {
+                return Optional.empty();
+            }
 
-            String userId = request.getHeader(USER_ID_HEADER);
+            String userId = attributes.getRequest().getHeader(USER_ID_HEADER);
 
             if (userId == null || userId.isBlank()) {
                 return Optional.empty();
@@ -48,9 +59,8 @@ public class SecurityAuditorAware implements AuditorAware<UUID> {
 
             return Optional.of(UUID.fromString(userId));
 
-        } catch (IllegalStateException e) {
-            return Optional.empty();
         } catch (IllegalArgumentException e) {
+            // UUID 형식이 아닌 경우 - Gateway 설정 오류
             log.warn("X-User-Id 헤더가 유효한 UUID 형식이 아닙니다.");
             return Optional.empty();
         }
