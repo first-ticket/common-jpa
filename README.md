@@ -88,10 +88,14 @@ public class Sample extends BaseEntity {
 }
 ```
 
-소프트 삭제가 필요한 경우 `delete()` 메서드를 호출합니다.
+소프트 삭제가 필요한 경우 도메인 엔티티에서 `delete()`를 호출하는 메서드를 정의합니다.
 
 ```java
-sample.delete();  // deletedAt 자동 설정
+// 도메인 엔티티
+public void softDelete() {
+    // 삭제 권한 검증
+    delete();  // deletedAt 자동 설정
+}
 ```
 
 ### BaseUserEntity
@@ -111,8 +115,12 @@ public class Sample extends BaseUserEntity {
 }
 ```
 
-소프트 삭제가 필요한 경우 `delete(UUID userId)` 메서드를 호출합니다.
+소프트 삭제가 필요한 경우 도메인 엔티티에서 `delete(UUID userId)`를 호출하는 메서드를 정의합니다.
 
 ```java
-sample.delete(userId);  // deletedAt, deletedBy 자동 설정
+// 도메인 엔티티
+public void softDelete(UUID userId) {
+    // 삭제 권한 검증
+    delete(userId);  // deletedAt, deletedBy 자동 설정
+}
 ```
