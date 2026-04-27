@@ -7,8 +7,8 @@ JPA 기본 엔티티 및 설정을 제공하는 공통 모듈입니다.
 ## 📝 버전
 
 | 버전 | 변경 내용 |
-|------|-----------|
-| `0.0.1-SNAPSHOT` | • JPA 기본 엔티티 및 설정 추가 (`BaseEntity`, `BaseUserEntity`, `CommonJpaAutoConfiguration`)<br>• QueryDSL 설정 추가 (`JPAQueryFactory` 빈 등록) |
+|------|------|
+| `0.0.1-SNAPSHOT` | • JPA 기본 엔티티 및 설정 추가 (`BaseEntity`, `BaseUserEntity`, `CommonJpaAutoConfiguration`)<br>• QueryDSL 설정 추가 (`JPAQueryFactory` 빈 등록) <br> • `SecurityAuditorAware` 추가 - X-User-Id 헤더 기반 JPA Auditing 자동 주입 (`createdBy`/`updatedBy`)|
 
 ---
 
@@ -26,9 +26,10 @@ implementation 'com.first-ticket:common-jpa:0.0.1-SNAPSHOT'
 
 ```
 com.firstticket.common.persistence
-├── CommonJpaAutoConfiguration.java  ← EntityScan, JPAQueryFactory 설정
+├── CommonJpaAutoConfiguration.java  ← EntityScan, JPAQueryFactory 설정, SecurityAuditorAware 등록
 ├── BaseEntity.java                  ← 생성/수정/삭제 시간
-└── BaseUserEntity.java              ← BaseEntity + 생성/수정/삭제 유저
+├── BaseUserEntity.java              ← BaseEntity + 생성/수정/삭제 유저
+└── SecurityAuditorAware.java        ← X-User-Id 헤더 기반 JPA Auditor
 ```
 
 ---
@@ -124,3 +125,13 @@ public void softDelete(UUID userId) {
     delete(userId);  // deletedAt, deletedBy 자동 설정
 }
 ```
+
+### SecurityAuditorAware
+
+`createdBy` / `updatedBy`는 `SecurityAuditorAware`가 자동으로 채워줍니다.
+
+| 동작 조건 | 결과 |
+  |---|---|
+| API Gateway가 `X-User-Id` 헤더 주입 | `createdBy` / `updatedBy`에 해당 UUID 자동 기록 |
+| 헤더 없음 (내부 호출, Flyway 등) | `null` 유지 (예외 발생하지 않음) |
+| 헤더 값이 UUID 형식이 아닌 경우 | `null` 유지 + warn 로그 출력 |
