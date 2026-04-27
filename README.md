@@ -1,0 +1,1 @@
+# com.firstticket.common-jpa
