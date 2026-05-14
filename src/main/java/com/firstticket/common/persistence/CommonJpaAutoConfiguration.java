@@ -11,8 +11,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @AutoConfiguration
-@EntityScan(basePackages = "com.firstticket")
-@EnableJpaRepositories(basePackages = "com.firstticket")
 @EnableJpaAuditing
 @Import(SecurityAuditorAware.class)
 public class CommonJpaAutoConfiguration {
