@@ -9,7 +9,7 @@ JPA 기본 엔티티 및 설정을 제공하는 공통 모듈입니다.
 | 버전 | 변경 내용 |
 |------|------|
 | `0.0.1-SNAPSHOT` | • JPA 기본 엔티티 및 설정 추가 (`BaseEntity`, `BaseUserEntity`, `CommonJpaAutoConfiguration`)<br>• QueryDSL 설정 추가 (`JPAQueryFactory` 빈 등록) <br> • `SecurityAuditorAware` 추가 - X-User-Id 헤더 기반 JPA Auditing 자동 주입 (`createdBy`/`updatedBy`)|
-| `0.0.2-SNAPSHOT` | • `CommonJpaAutoConfiguration`에서 `@EntityScan`, `@EnableJpaRepositories` 제거<br>• 각 서비스 `Application` 클래스에서 필요한 패키지만 명시하도록 변경 |
+| `0.0.2-SNAPSHOT` | • `CommonJpaAutoConfiguration`에서 `@EntityScan`, `@EnableJpaRepositories` 제거<br>• 각 서비스 `JpaConfig`에서 필요한 패키지만 명시하도록 변경 |
 
 ---
 
@@ -39,7 +39,7 @@ com.firstticket.common.persistence
 
 > ⚠️ `0.0.2-SNAPSHOT`부터 `@EntityScan`, `@EnableJpaRepositories` 자동 설정이 제거되었습니다.
 > `common-messaging`을 사용하지 않는 경우 `@SpringBootApplication` 기본 스캔이 동작하므로 별도 설정이 필요 없습니다.
-> `common-messaging` 사용 시 각 서비스 설정이 필요합니다. 자세한 내용은 [common-messaging README](https://github.com/first-ticket/common-messaging)를 참고해주세요.
+> `common-messaging` 사용 시 각 서비스 `JpaConfig` 설정이 필요합니다. 자세한 내용은 [common-messaging README](https://github.com/first-ticket/common-messaging)를 참고해주세요.
 
 `JPAQueryFactory` 빈을 자동으로 등록하여 QueryDSL을 바로 사용할 수 있습니다.
 
