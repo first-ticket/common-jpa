@@ -9,6 +9,7 @@ JPA 기본 엔티티 및 설정을 제공하는 공통 모듈입니다.
 | 버전 | 변경 내용 |
 |------|------|
 | `0.0.1-SNAPSHOT` | • JPA 기본 엔티티 및 설정 추가 (`BaseEntity`, `BaseUserEntity`, `CommonJpaAutoConfiguration`)<br>• QueryDSL 설정 추가 (`JPAQueryFactory` 빈 등록) <br> • `SecurityAuditorAware` 추가 - X-User-Id 헤더 기반 JPA Auditing 자동 주입 (`createdBy`/`updatedBy`)|
+| `0.0.2-SNAPSHOT` | • `CommonJpaAutoConfiguration`에서 `@EntityScan`, `@EnableJpaRepositories` 제거<br>• 각 서비스 `Application` 클래스에서 필요한 패키지만 명시하도록 변경 |
 
 ---
 
@@ -17,7 +18,7 @@ JPA 기본 엔티티 및 설정을 제공하는 공통 모듈입니다.
 > 배포 방법 및 의존성 추가는 [common README](https://github.com/first-ticket/common)를 참고해주세요.
 
 ```groovy
-implementation 'com.first-ticket:common-jpa:0.0.1-SNAPSHOT'
+implementation 'com.first-ticket:common-jpa:0.0.2-SNAPSHOT'
 ```
 
 ---
@@ -36,18 +37,11 @@ com.firstticket.common.persistence
 
 ## 🗄️ CommonJpaAutoConfiguration
 
-`com.firstticket` 하위 패키지를 자동으로 스캔하여 JPA 엔티티와 Repository를 등록합니다.
+> ⚠️ `0.0.2-SNAPSHOT`부터 `@EntityScan`, `@EnableJpaRepositories` 자동 설정이 제거되었습니다.
+> `common-messaging`을 사용하지 않는 경우 `@SpringBootApplication` 기본 스캔이 동작하므로 별도 설정이 필요 없습니다.
+> `common-messaging` 사용 시 각 서비스 설정이 필요합니다. 자세한 내용은 [common-messaging README](https://github.com/first-ticket/common-messaging)를 참고해주세요.
+
 `JPAQueryFactory` 빈을 자동으로 등록하여 QueryDSL을 바로 사용할 수 있습니다.
-
-> ⚠️ 모든 서비스의 베이스 패키지가 `com.firstticket`으로 시작해야 합니다.
-
-```java
-// 서비스 엔티티 자동 스캔됨
-package com.firstticket.sampleservice.domain;
-
-@Entity
-public class Sample extends BaseEntity { ... }
-```
 
 QueryDSL 사용 시 `JPAQueryFactory`를 주입받아 바로 사용합니다.
 
